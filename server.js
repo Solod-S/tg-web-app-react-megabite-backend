@@ -1,5 +1,10 @@
 const dotenv = require("dotenv");
+const shortid = require("shortid");
 const chalk = require("chalk");
+const { addRow } = require("./googleSheets");
+const { format } = require("date-fns");
+
+const currentDate = new Date();
 
 dotenv.config();
 const { WEB_APP_URL, PORT } = process.env;
@@ -28,19 +33,58 @@ bot.on("message", async (msg) => {
     }
   );
 
+  await bot.sendMessage(chatId, "Вам доступна форма зворотнього зв'язку ⬇⬇⬇", {
+    reply_markup: {
+      keyboard: [
+        [
+          {
+            text: "Форма зворотнього зв'язку",
+            web_app: { url: WEB_APP_URL + "form" },
+          },
+        ],
+      ],
+    },
+  });
+
   if (msg?.web_app_data?.data) {
     // ловим данные отправленные с веб приложения (c формы)
     try {
       const data = await JSON.parse(msg?.web_app_data?.data);
-      await bot.sendMessage(chatId, "Спасибо за ваше сообщение");
-      console.log(data);
-      await bot.sendMessage(chatId, "Ваша страна: " + data?.country);
-      await bot.sendMessage(chatId, "Ваша улица: " + data?.street);
-      setTimeout(async () => {
-        await bot.sendMessage(chatId, "Всю информацию вы получите в этом чате");
-      }, 3000);
+      const id = shortid.generate();
+      const formattedDate = format(currentDate, "dd.MM.yyyy");
+      const formattedTime = format(currentDate, "HH:mm");
+
+      await addRow({
+        id,
+        Тема: data?.subject,
+        Имя: data?.name,
+        Почта: data?.email,
+        Коментарий: data?.comment,
+        Дата: formattedDate,
+        Час: formattedTime,
+        TelegramId: msg.from.id,
+        TelegramUsername: msg.from.username ? msg.from.username : "-",
+      });
+
+      await bot.sendMessage(
+        chatId,
+        `Дякую за ваше повідомлення\n` +
+          `*Номер заявки:* ${id}\n` +
+          `*Тема:* ${data?.subject}\n` +
+          `*Ваше ім'я:* ${data?.name}\n` +
+          `*Ваш пошта:* ${data?.email}\n` +
+          `*Ваш коментар:* ${data?.comment}`,
+        { parse_mode: "Markdown" }
+      );
     } catch (error) {
       console.log(error.message);
+      await bot.sendMessage(
+        chatId,
+        `Щось пішло не так. Повторіть спробу пізніше\n`,
+        {
+          parse_mode: "Markdown",
+        }
+      );
     }
   }
 });
