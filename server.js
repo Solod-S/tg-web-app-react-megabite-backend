@@ -4,8 +4,6 @@ const chalk = require("chalk");
 const { addRow } = require("./googleSheets");
 const { format } = require("date-fns");
 
-const currentDate = new Date();
-
 dotenv.config();
 const { WEB_APP_URL, PORT } = process.env;
 const errorMsg = chalk.bgKeyword("white").redBright;
@@ -17,6 +15,9 @@ bot.on("message", async (msg) => {
   // слушатель событий сообщения
   const chatId = msg.chat.id;
   const text = msg.text;
+  const currentDate = new Date();
+  const formattedDate = format(currentDate, "dd.MM.yyyy");
+  const formattedTime = format(currentDate, "HH:mm");
 
   await bot.sendPhoto(
     chatId,
@@ -51,8 +52,6 @@ bot.on("message", async (msg) => {
     try {
       const data = await JSON.parse(msg?.web_app_data?.data);
       const id = shortid.generate();
-      const formattedDate = format(currentDate, "dd.MM.yyyy");
-      const formattedTime = format(currentDate, "HH:mm");
 
       await addRow({
         id,
