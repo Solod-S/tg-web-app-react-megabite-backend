@@ -1,4 +1,3 @@
-// Google sheet npm package
 const { GoogleSpreadsheet } = require("google-spreadsheet");
 
 // File handling package
@@ -13,6 +12,23 @@ const doc = new GoogleSpreadsheet(RESPONSES_SHEET_ID);
 // Credentials for the service account
 const CREDENTIALS = JSON.parse(fs.readFileSync("megabiteua.json"));
 
+const getRows = async (sheetIndex) => {
+  // use service account creds
+  await doc.useServiceAccountAuth({
+    client_email: CREDENTIALS.client_email,
+    private_key: CREDENTIALS.private_key,
+  });
+
+  // load the documents info
+  await doc.loadInfo();
+
+  // Index of the sheet
+  let sheet = doc.sheetsByIndex[sheetIndex];
+
+  // Get all the rows
+  return await sheet.getRows();
+};
+
 const getRow = async (email) => {
   // use service account creds
   await doc.useServiceAccountAuth({
@@ -24,7 +40,7 @@ const getRow = async (email) => {
   await doc.loadInfo();
 
   // Index of the sheet
-  let sheet = doc.sheetsByIndex[0];
+  let sheet = doc.sheetsByIndex[1];
 
   // Get all the rows
   let rows = await sheet.getRows();
@@ -37,7 +53,6 @@ const getRow = async (email) => {
     }
   }
 };
-
 // getRow('email@gmail.com');
 
 const addRow = async (rows) => {
@@ -51,7 +66,7 @@ const addRow = async (rows) => {
 
     // Index of the sheet
     let sheet = doc.sheetsByIndex[0];
-    
+
     // for (let index = 0; index < rows.length; index++) {
     //   const row = rows[index];
     //   console.log(row);
@@ -129,4 +144,4 @@ const deleteRow = async (keyValue, thisValue) => {
 
 deleteRow("email", "ramesh@ramesh.com");
 
-module.exports = { addRow };
+module.exports = { addRow, getRows };

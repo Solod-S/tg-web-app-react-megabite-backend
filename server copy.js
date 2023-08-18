@@ -46,22 +46,18 @@ bot.on("message", async (msg) => {
     return fetchPromoCodes(chatId);
   }
 
-  await bot.sendMessage(
-    chatId,
-    "Вам доступні команди в розділі меню, а також форма зворотнього зв'язку ⬇⬇⬇",
-    {
-      reply_markup: {
-        keyboard: [
-          [
-            {
-              text: "Форма зворотнього зв'язку",
-              web_app: { url: WEB_APP_URL + "form" },
-            },
-          ],
+  await bot.sendMessage(chatId, "Вам доступна форма зворотнього зв'язку ⬇⬇⬇", {
+    reply_markup: {
+      keyboard: [
+        [
+          {
+            text: "Форма зворотнього зв'язку",
+            web_app: { url: WEB_APP_URL + "form" },
+          },
         ],
-      },
-    }
-  );
+      ],
+    },
+  });
 
   if (msg?.web_app_data?.data) {
     // ловим данные отправленные с веб приложения (c формы)
@@ -80,37 +76,38 @@ bot.on("message", async (msg) => {
         TelegramId: msg.from.id,
         TelegramUsername: msg.from.username ? msg.from.username : "-",
       });
-      // await bot.sendSticker(
-      //   chatId,
-      //   "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4"
-      // );
-      // return bot.sendMessage(
-      //   chatId,
-      //   `Дякую за ваше повідомлення\n` +
-      //     `*Номер заявки:* ${id}\n` +
-      //     `*Тема:* ${data?.subject}\n` +
-      //     `*Ваше ім'я:* ${data?.name}\n` +
-      //     `*Ваш пошта:* ${data?.email}\n` +
-      //     `*Ваш коментар:* ${data?.comment}`,
-      //   { parse_mode: "Markdown" }
-      // );
 
-      const stickerUrl =
-        "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4";
-      const messageText =
-        `*Дякую за ваше повідомлення*\n` +
-        `.............\n` +
-        `*Номер заявки:* ${id}\n` +
-        `*Тема:* ${data?.subject}\n` +
-        `*Ваше ім'я:* ${data?.name}\n` +
-        `*Ваш пошта:* ${data?.email}\n` +
-        `*Ваш коментар:* ${data?.comment}`;
+      const message = [
+        `Дякую за ваше повідомлення\n` +
+          `*Номер заявки:* ${id}\n` +
+          `*Тема:* ${data?.subject}\n` +
+          `*Ваше ім'я:* ${data?.name}\n` +
+          `*Ваш пошта:* ${data?.email}\n` +
+          `*Ваш коментар:* ${data?.comment}`,
+      ].join("\n");
 
-      // const messageWithSticker = `${messageText}\n[Sticker](${stickerUrl})`;
-      const messageWithSticker = `${messageText}\n[.............](${stickerUrl})`;
+      return bot.sendSticker(
+        chatId,
+        "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4",
+        {
+          caption: message,
+          parse_mode: "Markdown",
+        }
+      );
+      return bot.sendMessage(
+        chatId,
+        `Дякую за ваше повідомлення\n` +
+          `*Номер заявки:* ${id}\n` +
+          `*Тема:* ${data?.subject}\n` +
+          `*Ваше ім'я:* ${data?.name}\n` +
+          `*Ваш пошта:* ${data?.email}\n` +
+          `*Ваш коментар:* ${data?.comment}`,
+        { parse_mode: "Markdown" }
+      );
 
-      return bot.sendMessage(chatId, messageWithSticker, {
-        parse_mode: "Markdown",
+      await bot.sendPhoto(chatId, row.Постер, {
+        caption: message,
+        parse_mode: "HTML",
       });
     } catch (error) {
       await bot.sendMessage(
