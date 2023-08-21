@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 const shortid = require("shortid");
 const chalk = require("chalk");
 
-const { fetchPromoCodes } = require("./utils");
+const { fetchPromoCodes, fetchDiscount } = require("./utils");
 const { addRow } = require("./utils/googleSheets");
 const { format } = require("date-fns");
 
@@ -16,6 +16,7 @@ const { app, bot } = require("./app");
 bot.setMyCommands([
   { command: "/info", description: "Про нас" },
   { command: "/promo", description: "Промокоди" },
+  { command: "/superdeal", description: "Супер пропозиції" },
 ]);
 
 bot.on("message", async (msg) => {
@@ -44,6 +45,9 @@ bot.on("message", async (msg) => {
   }
   if (text === "/promo") {
     return fetchPromoCodes(chatId);
+  }
+  if (text === "/superdeal") {
+    return fetchDiscount(chatId);
   }
 
   await bot.sendMessage(
@@ -80,20 +84,6 @@ bot.on("message", async (msg) => {
         TelegramId: msg.from.id,
         TelegramUsername: msg.from.username ? msg.from.username : "-",
       });
-      // await bot.sendSticker(
-      //   chatId,
-      //   "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4"
-      // );
-      // return bot.sendMessage(
-      //   chatId,
-      //   `Дякую за ваше повідомлення\n` +
-      //     `*Номер заявки:* ${id}\n` +
-      //     `*Тема:* ${data?.subject}\n` +
-      //     `*Ваше ім'я:* ${data?.name}\n` +
-      //     `*Ваш пошта:* ${data?.email}\n` +
-      //     `*Ваш коментар:* ${data?.comment}`,
-      //   { parse_mode: "Markdown" }
-      // );
 
       const stickerUrl =
         "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4";
@@ -106,7 +96,6 @@ bot.on("message", async (msg) => {
         `*Ваш пошта:* ${data?.email}\n` +
         `*Ваш коментар:* ${data?.comment}`;
 
-      // const messageWithSticker = `${messageText}\n[Sticker](${stickerUrl})`;
       const messageWithSticker = `${messageText}\n[.............](${stickerUrl})`;
 
       return bot.sendMessage(chatId, messageWithSticker, {
