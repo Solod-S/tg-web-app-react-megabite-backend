@@ -59,7 +59,7 @@ bot.on("message", async (msg) => {
           [
             {
               text: "Форма зворотнього зв'язку",
-              web_app: { url: WEB_APP_URL + "form" },
+              web_app: { url: WEB_APP_URL + "tgform" },
             },
           ],
         ],

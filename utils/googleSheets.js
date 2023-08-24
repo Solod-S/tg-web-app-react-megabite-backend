@@ -10,7 +10,9 @@ const RESPONSES_SHEET_ID = "1qBvrpEJugsnto-LT5VaazXCzKfVHPubrDbLO4baVaV8";
 const doc = new GoogleSpreadsheet(RESPONSES_SHEET_ID);
 
 // Credentials for the service account
-const CREDENTIALS = JSON.parse(fs.readFileSync("megabiteua.json"));
+const CREDENTIALS = JSON.parse(
+  fs.readFileSync("googleSheetsApiCredentials.json")
+);
 
 const getRows = async (sheetIndex) => {
   // use service account creds
