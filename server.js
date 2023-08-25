@@ -15,7 +15,7 @@ const { app, bot } = require("./app");
 
 bot.setMyCommands([
   { command: "/info", description: "Про нас" },
-  { command: "/promo", description: "Промокоди" },
+  { command: "/promo", description: "promocodeи" },
   { command: "/superdeal", description: "Супер пропозиції" },
 ]);
 
@@ -72,17 +72,18 @@ bot.on("message", async (msg) => {
     try {
       const data = await JSON.parse(msg?.web_app_data?.data);
       const id = shortid.generate();
-
+      console.log(msg?.chat?.id);
       await addRow({
         id,
-        Тема: data?.subject,
-        Имя: data?.name,
-        Почта: data?.email,
-        Коментарий: data?.comment,
-        Дата: formattedDate,
-        Час: formattedTime,
+        subject: data?.subject,
+        name: data?.name,
+        email: data?.email,
+        comment: data?.comment,
+        date: formattedDate,
+        time: formattedTime,
         TelegramId: msg.from.id,
         TelegramUsername: msg.from.username ? msg.from.username : "-",
+        ChatId: msg?.chat?.id ? msg?.chat?.id : "-",
       });
 
       const stickerUrl =

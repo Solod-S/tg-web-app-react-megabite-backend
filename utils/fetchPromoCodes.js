@@ -7,15 +7,15 @@ const fetchPromoCodes = async (chatId) => {
     const row = data[index];
 
     const message = [
-      `<b>Назва акції:</b> ${row?.Назва}`,
-      `<b>Прокод:</b> ${row?.Промокод}`,
-      `<b>Термін дії до:</b> ${row?.Термін}`,
-      `<b>Посилання на акцію:</b> ${row?.Посилання}`,
+      `<b>Назва акції:</b> ${row?.name}`,
+      `<b>Прокод:</b> ${row?.promocode}`,
+      `<b>Термін дії до:</b> ${row?.Term}`,
+      `<b>Посилання на акцію:</b> ${row?.promoCodeLink}`,
     ].join("\n");
 
     // await bot.sendMessage(chatId, message, { parse_mode: "HTML" });
 
-    await bot.sendPhoto(chatId, row?.Постер, {
+    await bot.sendPhoto(chatId, row?.posterLink, {
       caption: message,
       parse_mode: "HTML",
     });

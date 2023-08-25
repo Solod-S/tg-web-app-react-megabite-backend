@@ -15,7 +15,7 @@ const { app, bot } = require("./app");
 
 bot.setMyCommands([
   { command: "/info", description: "Про нас" },
-  { command: "/promo", description: "Промокоди" },
+  { command: "/promo", description: "promocodeи" },
 ]);
 
 bot.on("message", async (msg) => {
@@ -72,7 +72,7 @@ bot.on("message", async (msg) => {
         Почта: data?.email,
         Коментарий: data?.comment,
         Дата: formattedDate,
-        Час: formattedTime,
+        Время: formattedTime,
         TelegramId: msg.from.id,
         TelegramUsername: msg.from.username ? msg.from.username : "-",
       });
@@ -105,7 +105,7 @@ bot.on("message", async (msg) => {
         { parse_mode: "Markdown" }
       );
 
-      await bot.sendPhoto(chatId, row.Постер, {
+      await bot.sendPhoto(chatId, row.posterLink, {
         caption: message,
         parse_mode: "HTML",
       });
