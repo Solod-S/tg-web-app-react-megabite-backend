@@ -9,7 +9,7 @@ const fetchDiscount = async (chatId) => {
 
     const message = [
       `<b>Пропозиція:</b> ${row?.name}`,
-      `<b>Термін дії до:</b> ${row?.Term}`,
+      `<b>Термін дії до:</b> ${row?.date}`,
       `<b>Посилання на акцію:</b> ${row?.dealsLink}`,
     ].join("\n");
 

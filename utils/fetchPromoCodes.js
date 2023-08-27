@@ -9,7 +9,7 @@ const fetchPromoCodes = async (chatId) => {
     const message = [
       `<b>Назва акції:</b> ${row?.name}`,
       `<b>Прокод:</b> ${row?.promocode}`,
-      `<b>Термін дії до:</b> ${row?.Term}`,
+      `<b>Термін дії до:</b> ${row?.date}`,
       `<b>Посилання на акцію:</b> ${row?.promoCodeLink}`,
     ].join("\n");
 

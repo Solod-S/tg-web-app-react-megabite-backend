@@ -72,7 +72,6 @@ bot.on("message", async (msg) => {
     try {
       const data = await JSON.parse(msg?.web_app_data?.data);
       const id = shortid.generate();
-      console.log(msg?.chat?.id);
       await addRow({
         id,
         subject: data?.subject,
@@ -82,8 +81,9 @@ bot.on("message", async (msg) => {
         date: formattedDate,
         time: formattedTime,
         TelegramId: msg.from.id,
-        TelegramUsername: msg.from.username ? msg.from.username : "-",
-        ChatId: msg?.chat?.id ? msg?.chat?.id : "-",
+        TelegramUsername: msg.from.username,
+        ChatId: msg?.chat?.id,
+        file: data?.file,
       });
 
       const stickerUrl =
