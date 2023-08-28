@@ -2,7 +2,7 @@ const dotenv = require("dotenv");
 const shortid = require("shortid");
 const chalk = require("chalk");
 
-const { fetchPromoCodes } = require("./utils");
+const { fetchPromoCodes, fetchDiscount } = require("./utils");
 const { addRow } = require("./utils/googleSheets");
 const { format } = require("date-fns");
 
@@ -16,6 +16,7 @@ const { app, bot } = require("./app");
 bot.setMyCommands([
   { command: "/info", description: "Про нас" },
   { command: "/promo", description: "promocodeи" },
+  { command: "/superdeal", description: "Супер пропозиції" },
 ]);
 
 bot.on("message", async (msg) => {
@@ -45,69 +46,61 @@ bot.on("message", async (msg) => {
   if (text === "/promo") {
     return fetchPromoCodes(chatId);
   }
+  if (text === "/superdeal") {
+    return fetchDiscount(chatId);
+  }
 
-  await bot.sendMessage(chatId, "Вам доступна форма зворотнього зв'язку ⬇⬇⬇", {
-    reply_markup: {
-      keyboard: [
-        [
-          {
-            text: "Форма зворотнього зв'язку",
-            web_app: { url: WEB_APP_URL + "form" },
-          },
+  await bot.sendMessage(
+    chatId,
+    "Вам доступні команди в розділі меню, а також форма зворотнього зв'язку ⬇⬇⬇",
+    {
+      reply_markup: {
+        keyboard: [
+          [
+            {
+              text: "Форма зворотнього зв'язку",
+              web_app: { url: WEB_APP_URL + "tgform" },
+            },
+          ],
         ],
-      ],
-    },
-  });
+      },
+    }
+  );
 
   if (msg?.web_app_data?.data) {
-    // ловим данные отправленные с веб приложения (c формы)
+    // ловим данные, отправленные с веб приложения (c формы)
     try {
       const data = await JSON.parse(msg?.web_app_data?.data);
       const id = shortid.generate();
-
       await addRow({
         id,
-        Тема: data?.subject,
-        Имя: data?.name,
-        Почта: data?.email,
-        Коментарий: data?.comment,
-        Дата: formattedDate,
-        Время: formattedTime,
+        subject: data?.subject,
+        name: data?.name,
+        email: data?.email,
+        comment: data?.comment,
+        date: formattedDate,
+        time: formattedTime,
         TelegramId: msg.from.id,
-        TelegramUsername: msg.from.username ? msg.from.username : "-",
+        TelegramUsername: msg.from.username,
+        ChatId: msg?.chat?.id,
+        file: data?.file,
       });
 
-      const message = [
-        `Дякую за ваше повідомлення\n` +
-          `*Номер заявки:* ${id}\n` +
-          `*Тема:* ${data?.subject}\n` +
-          `*Ваше ім'я:* ${data?.name}\n` +
-          `*Ваш пошта:* ${data?.email}\n` +
-          `*Ваш коментар:* ${data?.comment}`,
-      ].join("\n");
+      const stickerUrl =
+        "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4";
+      const messageText =
+        `*Дякую за ваше повідомлення*\n` +
+        `.............\n` +
+        `*Номер заявки:* ${id}\n` +
+        `*Тема:* ${data?.subject}\n` +
+        `*Ваше ім'я:* ${data?.name}\n` +
+        `*Ваш пошта:* ${data?.email}\n` +
+        `*Ваш коментар:* ${data?.comment}`;
 
-      return bot.sendSticker(
-        chatId,
-        "https://tlgrm.eu/_/stickers/b0d/85f/b0d85fbf-de1b-4aaf-836c-1cddaa16e002/thumb-animated-128.mp4",
-        {
-          caption: message,
-          parse_mode: "Markdown",
-        }
-      );
-      return bot.sendMessage(
-        chatId,
-        `Дякую за ваше повідомлення\n` +
-          `*Номер заявки:* ${id}\n` +
-          `*Тема:* ${data?.subject}\n` +
-          `*Ваше ім'я:* ${data?.name}\n` +
-          `*Ваш пошта:* ${data?.email}\n` +
-          `*Ваш коментар:* ${data?.comment}`,
-        { parse_mode: "Markdown" }
-      );
+      const messageWithSticker = `${messageText}\n[.............](${stickerUrl})`;
 
-      await bot.sendPhoto(chatId, row.posterLink, {
-        caption: message,
-        parse_mode: "HTML",
+      return bot.sendMessage(chatId, messageWithSticker, {
+        parse_mode: "Markdown",
       });
     } catch (error) {
       await bot.sendMessage(
